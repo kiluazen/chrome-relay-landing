@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chrome Relay - Local browser control for coding agents</title>
+    <meta name="description" content="Chrome Relay connects your real Chrome session to local coding agents through the chrome-relay CLI. No cloud account, no telemetry, no remote relay." />
+    <meta property="og:title" content="Chrome Relay" />
+    <meta property="og:description" content="Let local coding agents use the browser session you already have open." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://chrome-relay.kushalsm.com" />
+    <meta property="og:image" content="https://chrome-relay.kushalsm.com/ext-index.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Chrome Relay" />
+    <meta name="twitter:description" content="A local bridge between Chrome and your coding agent." />
+    <link rel="canonical" href="https://chrome-relay.kushalsm.com" />
+    <link rel="icon" type="image/png" href="/icon-128.png" />
+    <style>
+      :root {
+        color-scheme: light;
+        --paper: #f7f3e8;
+        --ink: #181818;
+        --muted: #58544c;
+        --line: #d6d0c2;
+        --panel: #fffdf6;
+        --green: #1f7a4d;
+        --green-soft: #e6f2eb;
+        --shadow: 0 22px 70px rgba(16, 24, 32, 0.18);
+      }
+
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--paper);
+        color: var(--ink);
+        line-height: 1.55;
+      }
+
+      a { color: inherit; }
+
+      .hero {
+        min-height: 72vh;
+        background-image:
+          linear-gradient(90deg, rgba(247, 243, 232, 0.98) 0%, rgba(247, 243, 232, 0.92) 42%, rgba(247, 243, 232, 0.34) 100%),
+          url("/relay-cli.png");
+        background-size: cover;
+        background-position: center;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .nav, .hero-inner, .section, .footer {
+        width: min(1120px, calc(100% - 40px));
+        margin: 0 auto;
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 24px 0;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        font-weight: 750;
+      }
+
+      .brand img { width: 36px; height: 36px; border-radius: 8px; }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .nav-links a { text-decoration: none; }
+      .nav-links a:hover { color: var(--ink); }
+
+      .hero-inner { padding: 74px 0 92px; }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 18px;
+        color: var(--green);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .eyebrow::before {
+        content: "";
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--green);
+      }
+
+      h1 {
+        margin: 0 0 18px;
+        max-width: 700px;
+        font-size: clamp(44px, 8vw, 86px);
+        line-height: 0.95;
+        font-weight: 840;
+      }
+
+      .lede {
+        max-width: 620px;
+        margin: 0 0 30px;
+        color: #38352f;
+        font-size: 20px;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 0 16px;
+        border: 1px solid var(--ink);
+        border-radius: 8px;
+        background: var(--ink);
+        color: #fffdf6;
+        font-size: 14px;
+        font-weight: 760;
+        text-decoration: none;
+      }
+
+      .button.secondary { background: transparent; color: var(--ink); }
+      .button:hover { transform: translateY(-1px); }
+
+      .section { padding: 68px 0; }
+      .section.tight { padding: 44px 0; }
+
+      h2 {
+        margin: 0 0 14px;
+        font-size: 32px;
+        line-height: 1.1;
+      }
+
+      h3 { margin: 0 0 6px; font-size: 16px; }
+
+      p { margin: 0 0 16px; color: var(--muted); }
+
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.94em;
+      }
+
+      .split {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(320px, 1fr);
+        gap: 34px;
+        align-items: center;
+      }
+
+      .screenshot {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+      }
+
+      .screenshot img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        padding: 0;
+        margin: 26px 0 0;
+        list-style: none;
+        counter-reset: step;
+      }
+
+      .steps li {
+        counter-increment: step;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+      }
+
+      .steps li p { margin: 0; font-size: 14px; }
+
+      .steps li::before {
+        content: counter(step);
+        display: grid;
+        place-items: center;
+        width: 28px;
+        height: 28px;
+        margin-bottom: 14px;
+        border-radius: 50%;
+        background: var(--ink);
+        color: var(--panel);
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .command-block {
+        border: 1px solid #2d3239;
+        border-radius: 8px;
+        background: #20242b;
+        color: #f7f3e8;
+        padding: 18px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 14px;
+        overflow-x: auto;
+      }
+
+      .command-block span { color: #79d99a; }
+
+      .trust-list {
+        display: grid;
+        gap: 8px;
+        margin: 18px 0 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .trust-list li {
+        padding: 10px 14px;
+        border-left: 3px solid var(--green);
+        background: var(--green-soft);
+        color: #234033;
+        font-size: 14px;
+      }
+
+      .footer-wrap { border-top: 1px solid var(--line); }
+
+      .footer {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 28px 0 40px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .footer-links { display: flex; flex-wrap: wrap; gap: 14px; }
+      .footer a { text-decoration: none; }
+      .footer a:hover { color: var(--ink); }
+
+      @media (max-width: 820px) {
+        .hero { min-height: auto; background-position: 62% center; }
+        .hero-inner { padding: 56px 0 70px; }
+        .nav { align-items: flex-start; }
+        .nav-links { justify-content: flex-end; flex-wrap: wrap; }
+        .split { grid-template-columns: 1fr; }
+        .steps { grid-template-columns: 1fr 1fr; }
+      }
+
+      @media (max-width: 520px) {
+        .nav, .hero-inner, .section, .footer {
+          width: min(100% - 28px, 1120px);
+        }
+        .nav-links { font-size: 13px; gap: 10px; }
+        .lede { font-size: 18px; }
+        .actions { align-items: stretch; flex-direction: column; }
+        .button { width: 100%; }
+        .steps { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="/">
+          <img src="/icon-128.png" alt="" />
+          <span>Chrome Relay</span>
+        </a>
+        <div class="nav-links">
+          <a href="#how">How it works</a>
+          <a href="/privacy">Privacy</a>
+          <a href="/support">Support</a>
+          <a href="https://github.com/kiluazen/chrome-relay">GitHub</a>
+        </div>
+      </nav>
+
+      <div class="hero-inner">
+        <div class="eyebrow">Local browser bridge</div>
+        <h1>Chrome Relay</h1>
+        <p class="lede">
+          Let local coding agents drive the Chrome session you already have open &mdash; tabs, cookies, and
+          logged-in apps stay on your machine.
+        </p>
+        <div class="actions">
+          <a class="button" href="https://chromewebstore.google.com/detail/cpdiapbifblhlcpnmlmfpgfjlacebokb">Add to Chrome</a>
+          <a class="button secondary" href="#install">Install the CLI</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="section tight">
+        <div class="split">
+          <div>
+            <h2>For the browser you actually use.</h2>
+            <p>
+              Headless automation is fine for CI. Chrome Relay is for when your agent needs the tab already open
+              on your desktop &mdash; SSO, extensions, local dev servers, real profile state.
+            </p>
+            <p>
+              The extension talks only to a local native host. No cloud account, no telemetry, no remote relay.
+            </p>
+          </div>
+          <div class="screenshot">
+            <img src="/ext-index.png" alt="Chrome Relay popup showing a CLI command and recent local tool executions" />
+          </div>
+        </div>
+      </section>
+
+      <section id="install" class="section">
+        <div class="split">
+          <div>
+            <h2>Install</h2>
+            <p>Add the extension, then register the local native host.</p>
+            <ul class="trust-list">
+              <li>Native messaging pinned to the Chrome Relay extension IDs.</li>
+              <li>Local HTTP bridge on <code>127.0.0.1</code>, rejects browser-origin requests.</li>
+              <li>Only the last few tool summaries are stored &mdash; in Chrome local storage.</li>
+            </ul>
+          </div>
+          <div class="command-block" aria-label="CLI install commands">
+            <div><span>$</span> pnpm add -g chrome-relay</div>
+            <div><span>$</span> chrome-relay install</div>
+            <div><span>$</span> chrome-relay doctor</div>
+            <br />
+            <div><span>$</span> chrome-relay tabs</div>
+            <div><span>$</span> chrome-relay read -i</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="how" class="section tight">
+        <h2>How it works</h2>
+        <ol class="steps">
+          <li>
+            <h3>Extension</h3>
+            <p>Runs in Chrome, acts on tabs only when your local agent asks.</p>
+          </li>
+          <li>
+            <h3>Native host</h3>
+            <p>The <code>chrome-relay</code> CLI registers Chrome native messaging locally.</p>
+          </li>
+          <li>
+            <h3>Tools</h3>
+            <p>List tabs, navigate, click, fill, send keys, read pages, screenshot.</p>
+          </li>
+          <li>
+            <h3>Local only</h3>
+            <p>Traffic moves between Chrome, the host, and your CLI &mdash; on-device.</p>
+          </li>
+        </ol>
+      </section>
+    </main>
+
+    <div class="footer-wrap">
+      <footer class="footer">
+        <div>Chrome Relay by Kushal. CLI package: <code>chrome-relay</code>.</div>
+        <div class="footer-links">
+          <a href="/privacy">Privacy</a>
+          <a href="/terms">Terms</a>
+          <a href="/support">Support</a>
+          <a href="mailto:kushalsokke@gmail.com">Contact</a>
+          <a href="https://github.com/kiluazen/chrome-relay">GitHub</a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
