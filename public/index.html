@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chrome Relay - Terminal to real Chrome</title>
-    <meta name="description" content="Chrome Relay lets local coding agents drive your real Chrome profile through a local CLI bridge. Cookies, SSO, extensions, localhost. No remote relay." />
+    <title>Chrome Relay - Terminal to Chrome</title>
+    <meta name="description" content="Chrome Relay lets local coding agents drive an open Chrome session through a local CLI bridge. Cookies, SSO, extensions, localhost. No remote relay." />
     <meta property="og:title" content="Chrome Relay" />
     <meta property="og:description" content="Let local coding agents use the browser session you already have open." />
     <meta property="og:type" content="website" />
@@ -37,14 +37,15 @@
         background: var(--paper);
         color: var(--ink);
         line-height: 1.55;
+        overflow-x: hidden;
       }
 
       a { color: inherit; }
 
-      .hero { min-height: calc(100svh - 86px); }
+      .hero { min-height: calc(100svh - 78px); }
 
       .nav, .hero-inner, .skill-section, .footer {
-        width: min(1120px, calc(100% - 40px));
+        width: min(1240px, calc(100% - 56px));
         margin: 0 auto;
       }
 
@@ -67,14 +68,16 @@
       .brand img { width: 36px; height: 36px; border-radius: 8px; }
 
       .hero-inner {
-        padding: 50px 0 78px;
+        padding: clamp(42px, 6vw, 74px) 0 clamp(62px, 8vw, 96px);
         display: grid;
-        grid-template-columns: minmax(300px, 0.72fr) minmax(460px, 1.08fr);
-        gap: clamp(28px, 4vw, 56px);
+        grid-template-columns: minmax(330px, 0.72fr) minmax(520px, 1.18fr);
+        gap: clamp(34px, 5vw, 72px);
         align-items: center;
       }
 
-      .hero-copy { max-width: 560px; }
+      .hero-inner > * { min-width: 0; }
+
+      .hero-copy { max-width: 620px; }
 
       .demo {
         position: relative;
@@ -84,7 +87,7 @@
         box-shadow: var(--shadow);
         overflow: hidden;
         aspect-ratio: 1512 / 800;
-        width: min(100%, 760px);
+        width: min(100%, 840px);
         justify-self: end;
       }
 
@@ -110,13 +113,13 @@
 
       h1 {
         margin: 0 0 18px;
-        font-size: clamp(64px, 8vw, 116px);
+        font-size: clamp(68px, 8.2vw, 118px);
         line-height: 0.9;
         font-weight: 760;
         letter-spacing: -0.055em;
       }
 
-      h1 span { display: block; }
+      h1 .line { display: inline; }
 
       .lede {
         margin: 0 0 28px;
@@ -161,6 +164,13 @@
         gap: 16px;
         padding: 18px 0;
         flex-wrap: wrap;
+        justify-content: space-between;
+      }
+
+      .skill-copy {
+        display: grid;
+        gap: 2px;
+        min-width: 0;
       }
 
       .skill-label {
@@ -169,6 +179,12 @@
         font-weight: 700;
         letter-spacing: 0.08em;
         text-transform: uppercase;
+      }
+
+      .skill-help {
+        margin: 0;
+        color: #38352f;
+        font-size: 15px;
       }
 
       .command-card {
@@ -263,6 +279,8 @@
         font-size: 13px;
       }
 
+      .contact-note:empty { display: none; }
+
       .footer-wrap { border-top: 1px solid var(--line); }
 
       .footer {
@@ -285,10 +303,13 @@
       .footer a:hover { color: var(--ink); }
 
       @media (max-width: 900px) {
+        .nav, .hero-inner, .skill-section, .footer {
+          width: min(1120px, calc(100% - 40px));
+        }
         .hero-inner {
-          padding: 28px 0 52px;
+          padding: 34px 0 54px;
           grid-template-columns: 1fr;
-          gap: 28px;
+          gap: 34px;
         }
         .hero-copy { max-width: 680px; }
         .demo {
@@ -297,16 +318,17 @@
         }
         .skill-section {
           padding: 16px 0;
+          justify-content: flex-start;
         }
       }
 
-      @media (max-width: 520px) {
+      @media (max-width: 640px) {
         .nav, .hero-inner, .skill-section, .footer {
-          width: min(100% - 28px, 1120px);
+          width: min(1120px, calc(100% - 28px));
         }
         .nav {
           justify-content: center;
-          padding: 18px 0 12px;
+          padding: 18px 0 10px;
         }
         .brand img { width: 30px; height: 30px; }
         .brand { font-size: 18px; }
@@ -314,18 +336,64 @@
           padding-top: 18px;
           text-align: center;
         }
-        h1 { font-size: clamp(58px, 20vw, 88px); }
-        .lede { font-size: 17px; margin-bottom: 22px; }
-        .button { width: 100%; }
+        h1 {
+          max-width: none;
+          margin-inline: auto;
+          font-size: clamp(52px, 14vw, 76px);
+        }
+        h1 .line { display: block; }
+        .lede {
+          max-width: 31ch;
+          margin: 0 auto 22px;
+          font-size: clamp(16px, 4.2vw, 18px);
+        }
+        .actions { justify-content: center; }
+        .button {
+          width: min(100%, 360px);
+          min-height: 58px;
+        }
         .demo { border-radius: 8px; }
         .demo .demo-caption { display: none; }
         .skill-section {
           justify-content: center;
-          padding: 14px 0;
+          padding: 18px 0;
+          text-align: center;
+        }
+        .skill-help {
+          max-width: 31ch;
+          margin-inline: auto;
+        }
+        .command-card {
+          width: 100%;
+          align-items: stretch;
+          flex-direction: column;
+          justify-content: center;
+          min-width: 0;
+          padding: 12px;
+        }
+        .command-card code {
+          white-space: normal;
+          overflow-wrap: anywhere;
+          font-size: clamp(14px, 4vw, 17px);
+        }
+        .copy-button {
+          padding: 9px 10px;
+          width: 100%;
+        }
+        .contact-form {
+          width: min(520px, calc(100% - 28px));
+          padding: 30px 0 34px;
+        }
+        .contact-row {
+          flex-direction: column;
+        }
+        .contact-row button {
+          width: 100%;
         }
         .footer { flex-direction: column; padding: 22px 0 28px; }
         .footer-links { justify-content: flex-start; }
       }
+
     </style>
   </head>
   <body>
@@ -339,7 +407,7 @@
 
       <div class="hero-inner">
         <div class="hero-copy">
-          <h1>Terminal to Chrome.</h1>
+          <h1><span class="line">Terminal to</span> <span class="line">Chrome.</span></h1>
           <p class="lede">
             Let local agents use the Chrome session that already has cookies, SSO, extensions, and localhost.
             Nothing leaves the machine.
@@ -360,7 +428,10 @@
 
     <section class="skill-wrap">
       <div class="skill-section">
-        <span class="skill-label">Comes with an agent skill</span>
+        <div class="skill-copy">
+          <span class="skill-label">Comes with an agent skill</span>
+          <p class="skill-help">Install the playbook so agents know the Chrome Relay commands.</p>
+        </div>
         <div class="command-card">
           <code>npx skills add chrome-relay</code>
           <button class="copy-button" type="button" data-copy="npx skills add chrome-relay">Copy</button>
@@ -375,7 +446,7 @@
           <input id="contact-email" name="email" type="email" required placeholder="you@company.com" autocomplete="email" />
           <button type="submit">Send</button>
         </div>
-        <p class="contact-note" id="contact-note">Goes straight to Kushal.</p>
+        <p class="contact-note" id="contact-note" aria-live="polite"></p>
       </form>
     </section>
 
