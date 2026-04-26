@@ -203,6 +203,66 @@
 
       .copy-button:hover { background: rgba(255, 253, 246, 0.1); }
 
+      .contact-wrap {
+        border-top: 1px solid var(--line);
+      }
+
+      .contact-form {
+        width: min(1120px, calc(100% - 40px));
+        margin: 0 auto;
+        padding: 36px 0 44px;
+        max-width: 520px;
+      }
+
+      .contact-label {
+        display: block;
+        margin: 0 0 10px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .contact-row {
+        display: flex;
+        gap: 8px;
+      }
+
+      .contact-row input {
+        flex: 1;
+        min-height: 44px;
+        padding: 0 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        color: var(--ink);
+        font: inherit;
+        font-size: 15px;
+      }
+
+      .contact-row input:focus { outline: 2px solid rgba(31, 122, 77, 0.35); outline-offset: 2px; }
+
+      .contact-row button {
+        min-height: 44px;
+        padding: 0 18px;
+        border: 1px solid var(--ink);
+        border-radius: 8px;
+        background: var(--ink);
+        color: var(--panel);
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .contact-row button:disabled { opacity: 0.6; cursor: default; }
+
+      .contact-note {
+        margin: 10px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
       .footer-wrap { border-top: 1px solid var(--line); }
 
       .footer {
@@ -308,6 +368,17 @@
       </div>
     </section>
 
+    <section class="contact-wrap">
+      <form class="contact-form" id="contact-form">
+        <label class="contact-label" for="contact-email">Contact me</label>
+        <div class="contact-row">
+          <input id="contact-email" name="email" type="email" required placeholder="you@company.com" autocomplete="email" />
+          <button type="submit">Send</button>
+        </div>
+        <p class="contact-note" id="contact-note">Goes straight to Kushal.</p>
+      </form>
+    </section>
+
     <div class="footer-wrap">
       <footer class="footer">
         <a href="https://kushalsm.com">kushalsm.com</a>
@@ -326,6 +397,34 @@
             button.textContent = "Copy";
           }, 1400);
         });
+      });
+
+      const CONTACT_URL = "https://script.google.com/macros/s/AKfycbx09f-4aNddxzmVVUStNJwjzVip5u3PqVYN7GSgO83FDz5DqYLEFqy4ysARdZ6oeDo8rA/exec";
+      const PRODUCT = "chrome-relay";
+      const cForm = document.getElementById("contact-form");
+      const cNote = document.getElementById("contact-note");
+      cForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = document.getElementById("contact-email").value.trim();
+        if (!email || !email.includes("@")) return;
+        const btn = cForm.querySelector("button");
+        const original = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = "Sending…";
+        try {
+          await fetch(CONTACT_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({ product: PRODUCT, email, source: location.href }),
+          });
+          cForm.reset();
+          cNote.textContent = "Got it — I'll be in touch.";
+          btn.textContent = "Sent ✓";
+        } catch (err) {
+          btn.disabled = false;
+          btn.textContent = original;
+          cNote.textContent = "Send failed. Try again or email kushalsokke@gmail.com.";
+        }
       });
     </script>
   </body>
