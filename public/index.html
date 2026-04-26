@@ -42,9 +42,9 @@
 
       a { color: inherit; }
 
-      .hero { min-height: calc(100svh - 78px); }
+      .hero { min-height: min(860px, calc(100svh - 78px)); }
 
-      .nav, .hero-inner, .skill-section, .footer {
+      .nav, .hero-inner, .footer {
         width: min(1240px, calc(100% - 56px));
         margin: 0 auto;
       }
@@ -159,17 +159,20 @@
       }
 
       .skill-section {
-        display: flex;
+        width: min(760px, calc(100% - 56px));
+        margin: 0 auto;
+        display: grid;
         align-items: center;
-        gap: 16px;
-        padding: 18px 0;
-        flex-wrap: wrap;
-        justify-content: space-between;
+        justify-items: center;
+        gap: 14px;
+        padding: 40px 0;
+        text-align: center;
       }
 
       .skill-copy {
         display: grid;
-        gap: 2px;
+        justify-items: center;
+        gap: 4px;
         min-width: 0;
       }
 
@@ -185,6 +188,7 @@
         margin: 0;
         color: #38352f;
         font-size: 15px;
+        max-width: 54ch;
       }
 
       .command-card {
@@ -224,10 +228,10 @@
       }
 
       .contact-form {
-        width: min(1120px, calc(100% - 40px));
+        width: min(760px, calc(100% - 56px));
         margin: 0 auto;
-        padding: 36px 0 44px;
-        max-width: 520px;
+        padding: 54px 0 58px;
+        text-align: center;
       }
 
       .contact-label {
@@ -242,11 +246,14 @@
 
       .contact-row {
         display: flex;
+        justify-content: center;
+        align-items: stretch;
         gap: 8px;
       }
 
       .contact-row input {
-        flex: 1;
+        flex: 1 1 auto;
+        min-width: 0;
         min-height: 44px;
         padding: 0 14px;
         border: 1px solid var(--line);
@@ -260,7 +267,9 @@
       .contact-row input:focus { outline: 2px solid rgba(31, 122, 77, 0.35); outline-offset: 2px; }
 
       .contact-row button {
+        flex: 0 0 auto;
         min-height: 44px;
+        min-width: 96px;
         padding: 0 18px;
         border: 1px solid var(--ink);
         border-radius: 8px;
@@ -302,9 +311,34 @@
       .footer a { text-decoration: none; }
       .footer a:hover { color: var(--ink); }
 
+      @media (max-width: 1120px) {
+        .hero {
+          min-height: auto;
+        }
+        .hero-inner {
+          grid-template-columns: 1fr;
+          gap: 40px;
+        }
+        .hero-copy {
+          max-width: 860px;
+        }
+        h1 {
+          font-size: clamp(64px, 8vw, 92px);
+        }
+        .demo {
+          width: 100%;
+          max-width: 900px;
+          justify-self: center;
+        }
+      }
+
       @media (max-width: 900px) {
-        .nav, .hero-inner, .skill-section, .footer {
+        .nav, .hero-inner, .footer {
           width: min(1120px, calc(100% - 40px));
+        }
+        .skill-section,
+        .contact-form {
+          width: min(680px, calc(100% - 40px));
         }
         .hero-inner {
           padding: 34px 0 54px;
@@ -317,14 +351,17 @@
           justify-self: stretch;
         }
         .skill-section {
-          padding: 16px 0;
-          justify-content: flex-start;
+          padding: 34px 0;
         }
       }
 
       @media (max-width: 640px) {
-        .nav, .hero-inner, .skill-section, .footer {
+        .nav, .hero-inner, .footer {
           width: min(1120px, calc(100% - 28px));
+        }
+        .skill-section,
+        .contact-form {
+          width: min(520px, calc(100% - 28px));
         }
         .nav {
           justify-content: center;
@@ -339,7 +376,7 @@
         h1 {
           max-width: none;
           margin-inline: auto;
-          font-size: clamp(52px, 14vw, 76px);
+          font-size: clamp(46px, 12vw, 66px);
         }
         h1 .line { display: block; }
         .lede {
@@ -355,16 +392,14 @@
         .demo { border-radius: 8px; }
         .demo .demo-caption { display: none; }
         .skill-section {
-          justify-content: center;
-          padding: 18px 0;
-          text-align: center;
+          padding: 30px 0;
         }
         .skill-help {
           max-width: 31ch;
           margin-inline: auto;
         }
         .command-card {
-          width: 100%;
+          width: min(100%, 420px);
           align-items: stretch;
           flex-direction: column;
           justify-content: center;
@@ -381,17 +416,27 @@
           width: 100%;
         }
         .contact-form {
-          width: min(520px, calc(100% - 28px));
-          padding: 30px 0 34px;
+          padding: 40px 0 42px;
         }
+        .contact-row {
+          max-width: 420px;
+          margin: 0 auto;
+        }
+        .contact-row input,
+        .contact-row button {
+          min-height: 52px;
+        }
+        .footer { flex-direction: column; padding: 22px 0 28px; }
+        .footer-links { justify-content: center; }
+      }
+
+      @media (max-width: 760px) {
         .contact-row {
           flex-direction: column;
         }
         .contact-row button {
           width: 100%;
         }
-        .footer { flex-direction: column; padding: 22px 0 28px; }
-        .footer-links { justify-content: flex-start; }
       }
 
     </style>
@@ -474,6 +519,7 @@
       const PRODUCT = "chrome-relay";
       const cForm = document.getElementById("contact-form");
       const cNote = document.getElementById("contact-note");
+      cNote.textContent = "";
       cForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const email = document.getElementById("contact-email").value.trim();
